@@ -1,9 +1,17 @@
-import React from "react";
-import { Link, useNavigate } from "react-router-dom";
-import "./Navbar.css";
+import React, { useCallback } from "react";
+import { useDispatch, useSelector } from 'react-redux';
+import { Link } from "react-router-dom";
 
-const Navbar = ({ isLoggedin, setIsLoggedin }) => {
-  const navigate = useNavigate();
+import { setLoginStatus } from '../stores/blog';
+
+const Navbar = () => {
+  const dispatch = useDispatch();
+  const { loginStatus } = useSelector((state) => state.blogReducer);
+
+  const handleLogout = useCallback(() => {
+    localStorage.clear();
+    dispatch(setLoginStatus(false));
+  }, [dispatch])
 
   return (
     <nav className="navbar">
@@ -19,7 +27,7 @@ const Navbar = ({ isLoggedin, setIsLoggedin }) => {
             Posts
           </Link>
         </li>
-        {!isLoggedin ? (
+        {loginStatus || localStorage.getItem('token') ? (
           <li className="navbar__item">
             <Link to="/create" className="navbar__link">
               Create Post
@@ -28,21 +36,18 @@ const Navbar = ({ isLoggedin, setIsLoggedin }) => {
         ) : (
           <li></li>
         )}
-        <li className="navbar__item">
-          {!isLoggedin ? (
-            <button
+        <li className="navbar__item" title={loginStatus || localStorage.getItem('token')?localStorage.getItem('userEmail'):'Not logged in!'}>
+          {loginStatus || localStorage.getItem('token') ? (
+            <Link
               className="navbar__logout-button"
-              onClick={() => {
-                setIsLoggedin(!isLoggedin);
-                localStorage.clear();
-                navigate("/");
-              }}
+              onClick={handleLogout}
+              to='/'
             >
-              Log out
-            </button>
+              Log Out
+            </Link>
           ) : (
             <Link to="/login" className="navbar__link">
-              Login
+              Log In
             </Link>
           )}
         </li>

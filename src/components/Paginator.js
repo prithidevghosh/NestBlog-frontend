@@ -1,6 +1,5 @@
 import React from "react";
 
-import "./Paginator.css";
 
 function Paginator({ currentPage, totalPages, setCurrentPage }) {
   return (

@@ -1,42 +1,24 @@
-import axios from "axios";
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import "./Create.css";
+import React, { useCallback, useState } from "react";
+import { useDispatch, useSelector } from 'react-redux';
+
+import { createBlog } from '../stores/blog';
 
 function Create() {
-  const navigate = useNavigate();
+  const dispatch = useDispatch()
+  const { loading } = useSelector(state => state.blogReducer)
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [body, setBody] = useState("");
-  const [loading, setLoading] = useState(false);
-  const handleSubmit = (event) => {
+
+  const handleSubmit = useCallback((event) => {
     event.preventDefault();
-    setLoading(true);
-    // handle form submission
-    axios
-      .post(
-        process.env.REACT_APP_POST_CREATE_GET_UPDATE,
-        {
-          title,
-          description,
-          body,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      )
-      .then((res) => {
-        setLoading(false);
-        navigate("/post");
-        console.log(res);
-      })
-      .catch((err) => {
-        console.log(err);
-        setLoading(false);
-      });
-  };
+    dispatch(createBlog({
+      title,
+      description,
+      body,
+    }))
+  }, [body, description, dispatch, title]);
 
   return (
     <div className="create_container">
@@ -77,7 +59,7 @@ function Create() {
           />
         </div>
         <button className="PostForm__submit" type="submit">
-          {!loading ? "Create Post" : "Posting Blog"}
+          {!loading ? "Create Blog" : "Posting Blog"}
         </button>
       </form>
     </div>

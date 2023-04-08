@@ -1,35 +1,33 @@
-import axios from "axios";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Loading from "./Loading";
+import { useDispatch, useSelector } from 'react-redux';
 
-import "./Login.css";
+import { login } from '../stores/blog';
 
-const Login = ({ isLoggedin, setIsLoggedin }) => {
+import Loading from "../components/Loading";
+
+
+
+const Login = () => {
+  const navigate = useNavigate();
+  const {loginStatus,loading} = useSelector((state)=> state.blogReducer);
+  const dispatch = useDispatch();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+
   const handleLogin = (e) => {
-    setLoading(true);
     e.preventDefault();
-    axios
-      .post(process.env.REACT_APP_LOGIN, {
-        email: email,
-        password: password,
-      })
-      .then((response) => {
-        localStorage.setItem("token", response.data.access_token);
-        localStorage.setItem("userEmail", response.data.user.email);
-        setIsLoggedin(!isLoggedin);
-        navigate("/");
-        setLoading(false);
-      })
-      .catch((error) => {
-        setLoading(false);
-        console.error(error);
-      });
+    dispatch(login({
+      email: email,
+      password: password,
+    }))
   };
+
+  if(loginStatus){
+    navigate('/');
+  }
+
   return (
     <div className="container">
       <form className="login-form" onSubmit={handleLogin}>
@@ -64,7 +62,7 @@ const Login = ({ isLoggedin, setIsLoggedin }) => {
         </div>
         <div className="login-form__signup">
           <p>
-            New user ?
+            New user ?{" "}
             <span>
               <Link className="signup" to="/signup">
                 Sign Up

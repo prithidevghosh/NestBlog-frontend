@@ -1,6 +1,7 @@
-import axios from "axios";
-import React, { useState } from "react";
-import "./Update.css";
+import React, { useCallback, useState } from "react";
+import { useDispatch, useSelector } from 'react-redux';
+
+import { updateBlog } from '../stores/blog';
 
 const Modal = ({
   handleClose,
@@ -8,51 +9,39 @@ const Modal = ({
   title_post,
   body_post,
   description_post,
-  deleteLoad,
   blog_id,
-  setDeleteLoad,
-  setBlogs,
-  blogs,
 }) => {
+  const { blogs, loading } = useSelector((state) => state.blogReducer);
+  const dispatch = useDispatch();
+
   const [title, setTitle] = useState(title_post);
   const [description, setDescription] = useState(body_post);
   const [body, setBody] = useState(description_post);
-  const showHideClassName = show ? "modal display-block" : "modal display-none";
-  const updateBlog = () => {
-    setDeleteLoad(true);
-    console.log(process.env.REACT_APP_POST_CREATE_GET_UPDATE + `/${blog_id}`);
-    axios
-      .put(
-        process.env.REACT_APP_POST_CREATE_GET_UPDATE + `/${blog_id}`,
-        {
-          title: title,
-          description: description,
-          body: body,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      )
-      .then((res) => {
-        console.log(res.data);
-        setDeleteLoad(false);
-        let blog = blogs.filter((data) => data.id !== blog_id);
-        setBlogs([...blog, res.data]);
 
-        handleClose();
-      })
-      .catch((err) => {
-        console.log(err);
-        setDeleteLoad(false);
-        handleClose();
-      });
-  };
-  const handleEdit = (e) => {
+  const showHideClassName = show ? "modal display-block" : "modal display-none";
+
+  const handleEdit = useCallback((e) => {
     e.preventDefault();
-    updateBlog();
-  };
+    const newBlog = blogs.map((data) => {
+      if (data.id === blog_id) {
+        return {
+          ...data, title,
+          description,
+          body
+        }
+      }
+      else
+      return data
+    })
+    dispatch(updateBlog({
+      blogId: blog_id,
+      title,
+      description,
+      body,
+      newBlog
+    }))
+  }, [blog_id, blogs, body, description, dispatch, title])
+
   return (
     <div className={showHideClassName}>
       <section className="modal-main">
@@ -96,11 +85,10 @@ const Modal = ({
             />
           </div>
           <button
-            disabled={deleteLoad}
             className="PostForm__submit"
             type="submit"
           >
-            {!deleteLoad ? "Edit Post" : "Editing Blog"}
+            {loading ? "Updating" : "Update"}
           </button>
         </form>
       </section>

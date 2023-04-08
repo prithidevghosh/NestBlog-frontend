@@ -1,17 +1,21 @@
-// import axios from "axios";
-import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Loading from "./Loading";
-import "./Signup.css";
+import { useSelector } from 'react-redux';
+
+import { signUp } from '../stores/blog';
+import Loading from "../components/Loading";
+import { useDispatch } from 'react-redux';
 
 const Signup = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { loading } = useSelector((state) => state.blogReducer)
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [displayName, setDisplayName] = useState("");
-  const [loading, setLoading] = useState(false);
+
 
   useEffect(() => {
     if (localStorage.getItem("token")) {
@@ -19,26 +23,21 @@ const Signup = () => {
     }
   }, [navigate]);
 
-  const handleSignup = (e) => {
-    setLoading(true);
+  const handleSignup = useCallback((e) => {
     e.preventDefault();
-    axios
-      .post(process.env.REACT_APP_SIGNUP, {
-        name: displayName,
-        username: username,
-        password: password,
-        email: email,
-      })
-      .then((res) => {
-        setLoading(false);
-        navigate("/login");
-        console.log(res.data);
-      })
-      .catch((err) => {
-        setLoading(false);
-        console.log(err);
-      });
-  };
+
+    dispatch(signUp({
+      name: displayName,
+      username: username,
+      password: password,
+      email: email,
+    })).then(() => {
+      navigate("/login");
+    }).catch((error) => {
+      console.log(error);
+    });
+  }, [dispatch, displayName, email, navigate, password, username]);
+
   return (
     <div className="container">
       <form className="signup-form" onSubmit={handleSignup}>
