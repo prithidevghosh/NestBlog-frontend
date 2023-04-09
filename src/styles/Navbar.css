@@ -25,6 +25,7 @@
 .navbar__link {
   color: #ffffff;
   text-decoration: none;
+  font-size: 1.5rem;
 }
 
 .navbar__link:hover {
@@ -39,10 +40,12 @@
   border: none;
   background-color: transparent;
   color: #ffffff;
-  font-weight: bold;
+  font-size: 1.5rem;
   cursor: pointer;
+  text-decoration: none;
 }
 
-.navbar__logout-button:hover {
-  text-decoration: none;
+
+.navbar__logout-button:hover{
+  text-decoration: overline;
 }

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./Card.css";
+
 import Modal from "./Update";
 
 const Card = ({
@@ -8,32 +8,25 @@ const Card = ({
   body,
   publishDate,
   authorName,
-  onDelete,
   email,
-  loading,
   post_id,
-  setBlogs,
-  blogs,
+  handleDeletePost
 }) => {
   const userEmail = localStorage.getItem("userEmail");
-  const [deleteLoad, setDeleteLoad] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
   const handleCloseModal = () => {
     setShowModal(false);
   };
+
   return (
     <div className="card">
       <Modal
-        setBlogs={setBlogs}
-        blogs={blogs}
         title_post={title}
         description_post={description}
         body_post={body}
         show={showModal}
-        deleteLoad={deleteLoad}
         handleClose={handleCloseModal}
-        setDeleteLoad={setDeleteLoad}
         blog_id={post_id}
       />
       <div className="card__header">
@@ -45,15 +38,13 @@ const Card = ({
         <div className="info__footer footer">
           <p>Published on: {publishDate}</p>
           <p>Author: {authorName}</p>
-          {email === userEmail ? (
+          {email === userEmail && (
             <div className="footer__buttons">
-              <button disabled={loading} onClick={onDelete}>
-                {loading ? "Deleting" : "Delete"}
+              <button  onClick={()=>handleDeletePost(post_id)}>
+                Delete
               </button>
-              <button onClick={() => setShowModal(true)}>Update</button>
+              <button onClick={() => setShowModal(true)}>Edit</button>
             </div>
-          ) : (
-            ""
           )}
         </div>
       </div>
